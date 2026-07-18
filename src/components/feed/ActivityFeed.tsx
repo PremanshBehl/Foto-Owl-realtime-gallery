@@ -21,17 +21,20 @@ export function ActivityFeed() {
   // We can look it up in the React Query cache, or just construct a partial one if needed, 
   // but let's try to find it in the cache first.
   const handleFeedItemClick = (imageId: string) => {
-    const cachedData = queryClient.getQueryData<any>(['images'])
+    // Search all image queries (handles both default feed and search results)
+    const queries = queryClient.getQueriesData({ queryKey: ['images'] })
     let imageObj: UnsplashImage | null = null
     
-    if (cachedData) {
-      for (const page of cachedData.pages) {
+    for (const [, data] of queries) {
+      if (!data) continue
+      for (const page of (data as any).pages || []) {
         const found = page.images.find((img: UnsplashImage) => img.id === imageId)
         if (found) {
           imageObj = found
           break
         }
       }
+      if (imageObj) break
     }
 
     if (imageObj) {
@@ -92,8 +95,8 @@ export function ActivityFeed() {
                 onClick={() => handleFeedItemClick(activity.imageId)}
               >
                 <Avatar className="h-8 w-8 shrink-0 mt-1">
-                  <AvatarImage src={activity.user?.avatarUrl} />
-                  <AvatarFallback>{activity.user?.username?.charAt(0) || '?'}</AvatarFallback>
+                  <AvatarImage src={activity.userId === currentUser?.id ? currentUser.avatarUrl : activity.user?.avatarUrl} />
+                  <AvatarFallback>{(activity.userId === currentUser?.id ? currentUser.username : activity.user?.username)?.charAt(0) || '?'}</AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 space-y-1 overflow-hidden">
