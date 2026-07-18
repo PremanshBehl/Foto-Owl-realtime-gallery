@@ -11,12 +11,7 @@ export function ActivityFeed() {
   const queryClient = useQueryClient()
   
   const { data, isLoading } = db.useQuery({
-    activities: {
-      $: {
-        order: { createdAt: 'desc' },
-        limit: 50
-      }
-    },
+    activities: {},
     users: {}
   })
 
@@ -61,10 +56,12 @@ export function ActivityFeed() {
   }
 
   const activities = data?.activities || []
-  const enrichedActivities = activities.map(act => ({
+  const enrichedActivities = activities.map((act: any) => ({
     ...act,
-    user: data?.users.find(u => u.id === act.userId)
+    user: data?.users.find((u: any) => u.id === act.userId)
   }))
+  .sort((a: any, b: any) => b.createdAt - a.createdAt)
+  .slice(0, 50)
 
   return (
     <ScrollArea className="h-full py-6 pl-6 pr-6 lg:py-8">
