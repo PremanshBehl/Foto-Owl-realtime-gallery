@@ -2,12 +2,14 @@ import { db } from "@/lib/instantdb"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUIStore } from "@/store/useUIStore"
+import { useUserStore } from "@/store/useUserStore"
 import { useQueryClient } from "@tanstack/react-query"
 import type { UnsplashImage } from "@/types"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function ActivityFeed() {
   const { setSelectedImage } = useUIStore()
+  const { user: currentUser } = useUserStore()
   const queryClient = useQueryClient()
   
   const { data, isLoading } = db.useQuery({
@@ -96,8 +98,8 @@ export function ActivityFeed() {
                 
                 <div className="flex-1 space-y-1 overflow-hidden">
                   <p className="text-sm leading-tight text-foreground/90">
-                    <span className="font-semibold" style={{ color: activity.user?.color }}>
-                      {activity.user?.username || 'Unknown'}
+                    <span className="font-semibold" style={{ color: activity.userId === currentUser?.id ? currentUser.color : activity.user?.color }}>
+                      {activity.userId === currentUser?.id ? 'You' : (activity.user?.username || 'Unknown')}
                     </span>
                     {" "}
                     {activity.type === 'reaction' ? (

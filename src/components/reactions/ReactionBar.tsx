@@ -51,6 +51,11 @@ export function ReactionBar({ imageId, imageUrl }: ReactionBarProps) {
       const activityId = crypto.randomUUID()
       
       db.transact([
+        db.tx.users[user.id].update({
+          username: user.username,
+          color: user.color,
+          avatarUrl: user.avatarUrl,
+        }),
         db.tx.reactions[reactionId].update({
           imageId,
           userId: user.id,
